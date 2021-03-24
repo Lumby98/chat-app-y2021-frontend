@@ -31,8 +31,8 @@
           <mat-list-item *ngFor="let chatMessage of messages">
             <mat-icon mat-list-avatar>account_circle</mat-icon>
             <div mat-line class="primary-txt-color" style="font-size: 10px">{{chatMessage.timeStamp | date: 'hh:mm'}}</div>
-            <div mat-line class="primary-txt-color">{{chatMessage.sender?.nickname}}</div>
-            <div mat-line>{{chatMessage.message}}</div>
+            <div class="primary-txt-color" mat-line style="font-size: 12px">{{chatMessage.sender}}</div>
+            <div mat-line  style="font-size: 14px">{{chatMessage.message}}</div>
             <mat-divider></mat-divider>
           </mat-list-item>
         </mat-list>
@@ -40,7 +40,7 @@
       <mat-card-actions>
           <mat-form-field fxFlex>
             <mat-label>Enter Message</mat-label>
-            <input matInput type="text" [formControl]="messageFc">
+            <input matInput type=" text" [formControl]="messageFc">
             <button mat-button  matSuffix mat-icon-button aria-label="Clear" (click)="sendMessage()">
               <mat-icon>send</mat-icon>
             </button>

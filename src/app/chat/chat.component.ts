@@ -67,6 +67,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       .subscribe(welcome => {
         this.messages = welcome.messages;
         this.chatClient = this.chatService.chatClient = welcome.client;
+        console.log(this.messages);
       });
     if (this.chatService.chatClient) {
       this.chatService.sendNickname(this.chatService.chatClient.nickname);
