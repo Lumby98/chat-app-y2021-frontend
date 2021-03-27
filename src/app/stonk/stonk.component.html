@@ -1,0 +1,52 @@
+<div *ngIf="error" style="color: red">
+  {{error}}
+</div>
+<div fxLayout="row" fxFlex style="padding: 20px" fxLayoutGap="10px">
+  <div fxLayout="column" fxFlex="20">
+    <mat-card fxFlex>
+      <mat-card-header>
+        <h2>Stonks</h2>
+      </mat-card-header>
+      <mat-card-content>
+        <div>
+          <ul>
+            <li *ngFor="let stonk of stonks" (click)="selectStonk(stonk)">
+              {{stonk.name}}: {{stonk.price}}
+            </li>
+          </ul>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div fxLayout="column" fxFlex="80" *ngIf="selectedStonk">
+    <mat-card fxFlex fxLayout="column">
+      <mat-card-header>
+        <h2>{{selectedStonk.name}}</h2>
+      </mat-card-header>
+      <mat-card-content fxFlex>
+        <mat-list fxFlex class="scrollable">
+          <mat-list-item>
+            <div mat-line  style="font-size: 14px">{{selectedStonk.price}}</div>
+            <div mat-line  style="font-size: 14px">{{selectedStonk.description}}</div>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+      <mat-card-actions fxLayout="row" fxLayoutAlign="end end">
+        <mat-form-field appearance="fill" fxFlex="10">
+          <mat-label>Value to update</mat-label>
+          <select matNativeControl required [formControl]="stonkVariableFC">
+            <option value="price">price</option>
+            <option value="description">description</option>
+          </select>
+        </mat-form-field>
+        <mat-form-field fxFlex="90" style="padding-left: 5px">
+          <mat-label>Enter value</mat-label>
+          <input matInput type=" text" [formControl]="stonkInputFC">
+          <button mat-button  matSuffix mat-icon-button aria-label="Clear" (click)="updateStonk()">
+            <mat-icon>send</mat-icon>
+          </button>
+        </mat-form-field>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
