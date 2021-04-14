@@ -4,6 +4,9 @@ import {Observable, Subject} from 'rxjs';
 import {Stonk} from './shared/stonk.model';
 import {takeUntil} from 'rxjs/operators';
 import {FormControl} from '@angular/forms';
+import {Select, Store} from '@ngxs/store';
+import {StonkState} from './shared/stonk-state';
+import {StartListenForStonks, StopListenForStonks, UpdateStonk} from './shared/stonk-actions';
 
 @Component({
   selector: 'app-stonk',
@@ -18,8 +21,10 @@ export class StonkComponent implements OnInit, OnDestroy {
   selectedStonk: Stonk | undefined;
   stonkVariableFC = new FormControl('');
   stonkInputFC = new FormControl('');
-
-  constructor(private stonkService: StonkService) { }
+  @Select(StonkState.stonks)
+  stonk$: Observable<Stonk[]> | undefined;
+  constructor(private stonkService: StonkService,
+              private store: Store) { }
 
   ngOnInit(): void {
     this.stonkService.listenForErrors()
@@ -29,12 +34,19 @@ export class StonkComponent implements OnInit, OnDestroy {
         this.error = error;
       });
 
-    this.stonkService.listenForStonks()
-      .pipe(takeUntil(this.unsubscribe$)
-      )
-      .subscribe( stonk => {
-        this.stonks = stonk;
-      });
+    this.store.dispatch(new StartListenForStonks());
+    this.stonk$?.pipe(
+    takeUntil(this.unsubscribe$)
+    ).subscribe(stonks => {
+      const stonksClone: Stonk[] = [];
+      stonks.forEach(value => stonksClone.
+      push({
+        name: value.name,
+        price: value.price,
+        description: value.description})
+      );
+      this.stonks = stonksClone;
+    });
 
     this.stonkService.listenForStonkUpdate()
       .pipe(
@@ -43,6 +55,7 @@ export class StonkComponent implements OnInit, OnDestroy {
       .subscribe( stonk => {
         const index = this.stonks.findIndex((s) => s.name === stonk.name);
         this.stonks[index] = stonk;
+        this.store.dispatch(new UpdateStonk(this.stonks));
       });
   }
 
@@ -50,6 +63,7 @@ export class StonkComponent implements OnInit, OnDestroy {
     console.log('Destroyed stonks');
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.store.dispatch(new StopListenForStonks());
   }
 
   selectStonk(stonk: Stonk): void {

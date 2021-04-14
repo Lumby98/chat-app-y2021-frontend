@@ -10,6 +10,8 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
 import {MatListModule} from '@angular/material/list';
+import {NgxsModule} from '@ngxs/store';
+import {StonkState} from './shared/stonk-state';
 
 
 @NgModule({
@@ -23,7 +25,8 @@ import {MatListModule} from '@angular/material/list';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatListModule
+    MatListModule,
+    NgxsModule.forFeature([StonkState])
   ]
 })
 export class StonkModule { }

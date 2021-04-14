@@ -6,6 +6,10 @@ import { AppComponent } from './app.component';
 import {Socket, SocketIoConfig, SocketIoModule} from 'ngx-socket-io';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {SharedModule} from './shared/shared.module';
+import {NgxsModule} from '@ngxs/store';
+import {environment} from '../environments/environment';
+import {NgxsLoggerPluginModule} from '@ngxs/logger-plugin';
+import {NgxsStoragePluginModule} from '@ngxs/storage-plugin';
 
 @Injectable()
 export class SocketChat extends Socket {
@@ -33,7 +37,12 @@ export class SocketStonk extends Socket {
     AppRoutingModule,
     SocketIoModule,
     BrowserAnimationsModule,
-    SharedModule
+    SharedModule,
+    NgxsModule.forRoot([], {
+      developmentMode: !environment.production
+    }),
+    NgxsLoggerPluginModule.forRoot(),
+    NgxsStoragePluginModule.forRoot()
   ],
   providers: [SocketChat, SocketStonk],
   bootstrap: [AppComponent]
