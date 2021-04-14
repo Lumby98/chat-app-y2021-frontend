@@ -5,6 +5,9 @@ import {Observable, pipe, Subject, Subscription} from 'rxjs';
 import {debounceTime, take, takeUntil} from 'rxjs/operators';
 import {ChatClient} from './shared/chat-client.model';
 import {ChatMessage} from './shared/chat-message.model';
+import {JoinChatDto} from './shared/join-chat.dto';
+import {StorageService} from '../shared/storage.service';
+import {SendMessageDto} from './shared/send-message.dto';
 
 @Component({
   selector: 'app-chat',
@@ -24,7 +27,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   error$: Observable<string> | undefined;
   socketId: string | undefined;
 
-  constructor(private chatService: ChatService) { }
+  constructor(private chatService: ChatService,
+              private storageService: StorageService) { }
 
   ngOnInit(): void {
     this.clients$ = this.chatService.listenForClients();
@@ -66,11 +70,15 @@ export class ChatComponent implements OnInit, OnDestroy {
       )
       .subscribe(welcome => {
         this.messages = welcome.messages;
-        this.chatClient = this.chatService.chatClient = welcome.client;
-        console.log(this.messages);
+        this.chatClient = welcome.client;
+        this.storageService.saveChatClient(this.chatClient);
       });
-    if (this.chatService.chatClient) {
-      this.chatService.sendNickname(this.chatService.chatClient.nickname);
+    const oldClient = this.storageService.loadChatClient();
+    if (oldClient) {
+      this.chatService.joinChat({
+        id: oldClient.id,
+        nickname: oldClient.nickname
+      });
     }
 
     this.chatService.listenForConnect()
@@ -98,13 +106,18 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   sendMessage(): void {
     console.log((this.messageFc.value));
-    this.chatService.sendMessage(this.messageFc.value);
-    this.messageFc.patchValue('');
+    if (this.chatClient)
+    {
+      const messagedto: SendMessageDto = {message: this.messageFc.value, client: this.chatClient};
+      this.chatService.sendMessage(messagedto);
+      this.messageFc.patchValue('');
+    }
   }
 
   sendNickname(): void {
     if (this.nicknameFc.value){
-    this.chatService.sendNickname(this.nicknameFc.value);
+      const dto: JoinChatDto = {nickname: this.nicknameFc.value};
+      this.chatService.joinChat(dto);
     }
   }
 }

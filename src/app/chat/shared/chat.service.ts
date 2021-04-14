@@ -5,18 +5,19 @@ import {ChatMessage} from './chat-message.model';
 import {WelcomeDto} from './welcome.dto';
 import {map} from 'rxjs/operators';
 import {SocketChat} from '../../app.module';
+import {JoinChatDto} from './join-chat.dto';
+import {SendMessageDto} from './send-message.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
 
-  chatClient: ChatClient | undefined;
 
   constructor(private socket: SocketChat) { }
 
-  sendMessage(msg: string): void{
-    this.socket.emit('message', msg);
+  sendMessage(dto: SendMessageDto): void{
+    this.socket.emit('message', dto);
   }
 
   sendTyping(typing: boolean): void {
@@ -69,8 +70,8 @@ export class ChatService {
       .fromEvent<ChatClient>('clientTyping');
   }
 
-  sendNickname(nickname: string): void {
-    this.socket.emit('nickname', nickname);
+  joinChat(dto: JoinChatDto): void {
+    this.socket.emit('joinChat', dto);
   }
 
   getAllMessages(): Observable<ChatMessage[]> {
